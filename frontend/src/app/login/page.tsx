@@ -43,6 +43,13 @@ export default function LoginPage() {
 
   // Prevent duplicate concurrent Supabase session sync calls and stacked toasts
   const isSyncingRef = useRef(false)
+  // If already authenticated, redirect straight to dashboard
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+    if (token) {
+      router.replace('/dashboard')
+    }
+  }, [router])
 
   // Developer Mode toggle: false by default for clean user experience
   const [isDevMode, setIsDevMode] = useState(false)
@@ -454,9 +461,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-[#FAF6F0]">
+    <div className="min-h-screen flex bg-[#FAFBF9]">
       {/* Left panel – form container */}
-      <div className="flex-1 flex flex-col justify-between px-6 py-8 sm:px-10 lg:px-12 bg-[#FAF6F0] border-r border-[#E8DFD1] relative overflow-y-auto">
+      <div className="flex-1 flex flex-col justify-between px-6 py-8 sm:px-10 lg:px-12 bg-[#FAFBF9] border-r border-[#E5ECE7] relative overflow-y-auto">
 
         {/* Top Bar: Brand Logo & Developer Mode Switch */}
         <div className="flex items-center justify-between w-full max-w-md mx-auto mb-6">
@@ -477,7 +484,7 @@ export default function LoginPage() {
               </div>
             </div>
             <span className="font-extrabold text-2xl text-stone-900 tracking-tight">
-              Interior<span className="text-[#b85d3b]">AI</span>
+              Interior<span className="text-[#059669]">AI</span>
             </span>
           </Link>
 
@@ -493,7 +500,7 @@ export default function LoginPage() {
               'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border shadow-xs',
               isDevMode
                 ? 'bg-amber-100 text-amber-900 border-amber-300 ring-2 ring-amber-400/30'
-                : 'bg-white text-stone-600 hover:text-stone-900 hover:bg-[#F5EDE2] border-[#E8DFD1]'
+                : 'bg-white text-stone-600 hover:text-stone-900 hover:bg-[#F4F6F4] border-[#E5ECE7]'
             )}
             title="Toggle developer mode for role simulation and bypass OTP testing"
           >
@@ -517,7 +524,7 @@ export default function LoginPage() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white p-7 rounded-2xl border border-[#E8DFD1] shadow-sm text-center space-y-4"
+                  className="bg-white p-7 rounded-2xl border border-[#E5ECE7] shadow-sm text-center space-y-4"
                 >
                   <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
                     <CheckCircle2 className="w-8 h-8" />
@@ -527,14 +534,14 @@ export default function LoginPage() {
                     We sent a verification link to <strong className="text-stone-900">{email}</strong>.
                     Please click the link in your email to verify your account and sign in.
                   </p>
-                  <div className="pt-2 border-t border-[#E8DFD1]">
+                  <div className="pt-2 border-t border-[#E5ECE7]">
                     <button
                       type="button"
                       onClick={() => {
                         setVerificationSent(false)
                         setMode('signin')
                       }}
-                      className="text-sm font-bold text-[#b85d3b] hover:underline"
+                      className="text-sm font-bold text-[#059669] hover:underline"
                     >
                       ← Back to Sign In
                     </button>
@@ -573,7 +580,7 @@ export default function LoginPage() {
                     <form onSubmit={handleResetPassword} className="space-y-4">
                       <div>
                         <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                          <Mail className="w-3.5 h-3.5 text-[#b85d3b]" /> Email Address
+                          <Mail className="w-3.5 h-3.5 text-[#059669]" /> Email Address
                         </label>
                         <input
                           type="email"
@@ -581,14 +588,14 @@ export default function LoginPage() {
                           placeholder="you@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="input w-full px-4 py-3 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
+                          className="input w-full px-4 py-3 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full justify-center py-3.5 text-base rounded-xl font-bold bg-[#b85d3b] hover:bg-[#a34f30] text-white shadow-sm flex items-center gap-2 transition"
+                        className="w-full justify-center py-3.5 text-base rounded-xl font-bold bg-gradient-to-r from-[#A3E635] to-[#84CC16] hover:from-[#B5F442] hover:to-[#8ED618] text-[#0B0F0D] font-bold shadow-[0_4px_20px_rgba(163,230,53,0.35)] shadow-sm flex items-center gap-2 transition"
                       >
                         {loading ? <div className="spinner w-5 h-5 border-white" /> : <span>Send Reset Link</span>}
                       </button>
@@ -597,7 +604,7 @@ export default function LoginPage() {
                         <button
                           type="button"
                           onClick={() => setIsResetMode(false)}
-                          className="text-xs font-bold text-stone-500 hover:text-[#b85d3b] transition"
+                          className="text-xs font-bold text-stone-500 hover:text-[#059669] transition"
                         >
                           ← Cancel and go back to Sign In
                         </button>
@@ -630,7 +637,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleGoogleAuth}
                     disabled={loading}
-                    className="w-full py-3 px-4 bg-white hover:bg-stone-50 text-stone-800 font-semibold text-sm rounded-xl border border-[#E8DFD1] shadow-xs flex items-center justify-center gap-3 transition-all transform active:scale-[0.99] mb-5"
+                    className="w-full py-3 px-4 bg-white hover:bg-stone-50 text-stone-800 font-semibold text-sm rounded-xl border border-[#E5ECE7] shadow-xs flex items-center justify-center gap-3 transition-all transform active:scale-[0.99] mb-5"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -654,8 +661,8 @@ export default function LoginPage() {
                   </button>
 
                   <div className="relative flex items-center justify-center mb-5">
-                    <div className="border-t border-[#E8DFD1] w-full" />
-                    <span className="bg-[#FAF6F0] px-3 text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                    <div className="border-t border-[#E5ECE7] w-full" />
+                    <span className="bg-[#FAFBF9] px-3 text-xs font-semibold text-stone-400 uppercase tracking-wider">
                       or with email
                     </span>
                   </div>
@@ -673,7 +680,7 @@ export default function LoginPage() {
                         className="space-y-1.5"
                       >
                         <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider flex items-center gap-1">
-                          <User className="w-3.5 h-3.5 text-[#b85d3b]" /> Full Name
+                          <User className="w-3.5 h-3.5 text-[#059669]" /> Full Name
                         </label>
                         <input
                           type="text"
@@ -681,7 +688,7 @@ export default function LoginPage() {
                           placeholder="Amey Kulkarni"
                           value={signupName}
                           onChange={(e) => setSignupName(e.target.value)}
-                          className="input w-full px-4 py-3 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
+                          className="input w-full px-4 py-3 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
                         />
                       </motion.div>
                     )}
@@ -689,7 +696,7 @@ export default function LoginPage() {
                     {/* Email Input */}
                     <div className="space-y-1.5">
                       <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider flex items-center gap-1">
-                        <Mail className="w-3.5 h-3.5 text-[#b85d3b]" /> Email Address
+                        <Mail className="w-3.5 h-3.5 text-[#059669]" /> Email Address
                       </label>
                       <input
                         type="email"
@@ -697,7 +704,7 @@ export default function LoginPage() {
                         placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="input w-full px-4 py-3 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
+                        className="input w-full px-4 py-3 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
                       />
                     </div>
 
@@ -705,13 +712,13 @@ export default function LoginPage() {
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
                         <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider flex items-center gap-1">
-                          <Lock className="w-3.5 h-3.5 text-[#b85d3b]" /> Password
+                          <Lock className="w-3.5 h-3.5 text-[#059669]" /> Password
                         </label>
                         {mode === 'signin' && (
                           <button
                             type="button"
                             onClick={() => setIsResetMode(true)}
-                            className="text-xs font-bold text-[#b85d3b] hover:underline"
+                            className="text-xs font-bold text-[#059669] hover:underline"
                           >
                             Forgot password?
                           </button>
@@ -724,7 +731,7 @@ export default function LoginPage() {
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="input w-full px-4 py-3 pr-10 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
+                          className="input w-full px-4 py-3 pr-10 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
                         />
                         <button
                           type="button"
@@ -740,7 +747,7 @@ export default function LoginPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full justify-center py-3.5 text-base mt-2 rounded-xl font-bold bg-[#b85d3b] hover:bg-[#a34f30] text-white shadow-sm flex items-center gap-2 transition"
+                      className="w-full justify-center py-3.5 text-base mt-2 rounded-xl font-bold bg-gradient-to-r from-[#A3E635] to-[#84CC16] hover:from-[#B5F442] hover:to-[#8ED618] text-[#0B0F0D] font-bold shadow-[0_4px_20px_rgba(163,230,53,0.35)] shadow-sm flex items-center gap-2 transition"
                     >
                       {loading ? (
                         <div className="spinner w-5 h-5 border-white" />
@@ -764,7 +771,7 @@ export default function LoginPage() {
                             setMode('signup')
                             setPassword('')
                           }}
-                          className="text-[#b85d3b] font-bold hover:underline"
+                          className="text-[#059669] font-bold hover:underline"
                         >
                           Sign Up
                         </button>
@@ -778,7 +785,7 @@ export default function LoginPage() {
                             setMode('signin')
                             setPassword('')
                           }}
-                          className="text-[#b85d3b] font-bold hover:underline"
+                          className="text-[#059669] font-bold hover:underline"
                         >
                           Sign In
                         </button>
@@ -801,9 +808,9 @@ export default function LoginPage() {
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5">
-                    <Wrench className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                    <div className="text-xs text-amber-900 leading-snug">
+                  <div className="mb-4 p-3 bg-[#161D1A]/5 border border-[#161D1A]/10 rounded-xl flex items-start gap-2.5">
+                    <Wrench className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
+                    <div className="text-xs text-stone-800 leading-snug">
                       <span className="font-bold">🛠️ Developer Mode Active:</span> Select any platform stakeholder role below to pre-fill test credentials and simulate login without external email/SMS providers.
                     </div>
                   </div>
@@ -822,7 +829,7 @@ export default function LoginPage() {
                     </label>
                     <div className="grid grid-cols-6 gap-2">
                       {([
-                        { id: 'client', label: 'Client', icon: User, bg: 'from-[#b85d3b] to-[#9c4a2a]', colClass: 'col-span-2' },
+                        { id: 'client', label: 'Client', icon: User, bg: 'from-[#161D1A] to-[#0B0F0D]', colClass: 'col-span-2' },
                         { id: 'vendor', label: 'Vendor', icon: Compass, bg: 'from-emerald-600 to-teal-700', colClass: 'col-span-2' },
                         { id: 'team', label: 'Project Team', icon: Check, bg: 'from-amber-600 to-orange-700', colClass: 'col-span-2' },
                         { id: 'consultant', label: 'Consultant', icon: Briefcase, bg: 'from-cyan-600 to-sky-700', colClass: 'col-span-2 col-start-2' },
@@ -850,12 +857,12 @@ export default function LoginPage() {
                               'relative overflow-hidden px-2 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-300 transform min-w-0',
                               isSelected
                                 ? `bg-gradient-to-r ${item.bg} text-white shadow-md scale-[1.02]`
-                                : 'bg-white text-stone-600 hover:bg-[#F5EDE2] hover:text-stone-900 border border-[#E8DFD1]'
+                                : 'bg-white text-stone-600 hover:bg-[#F4F6F4] hover:text-stone-900 border border-[#E5ECE7]'
                             )}
                           >
                             <div className={clsx(
                               'p-1 rounded-lg shrink-0',
-                              isSelected ? 'bg-white/20' : 'bg-[#FAF6F0] shadow-2xs'
+                              isSelected ? 'bg-white/20' : 'bg-[#FAFBF9] shadow-2xs'
                             )}>
                               <Icon className={clsx("w-3.5 h-3.5", isSelected ? 'text-white' : 'text-stone-500')} />
                             </div>
@@ -892,7 +899,7 @@ export default function LoginPage() {
                                 }}
                                 className={clsx(
                                   'py-2 px-3 text-xs font-bold rounded-lg border transition-all text-center',
-                                  clientRole === item.id ? 'bg-[#b85d3b] border-[#b85d3b] text-white shadow-sm' : 'bg-white border-[#E8DFD1] text-stone-600 hover:bg-[#F5EDE2]'
+                                  clientRole === item.id ? 'bg-[#161D1A] border-[#10B981] text-white shadow-sm' : 'bg-white border-[#E5ECE7] text-stone-600 hover:bg-[#F4F6F4]'
                                 )}
                               >
                                 {item.label}
@@ -929,7 +936,7 @@ export default function LoginPage() {
                                 }}
                                 className={clsx(
                                   'py-2 px-2 text-xs font-bold rounded-lg border transition-all text-center',
-                                  teamRole === item.id ? 'bg-[#b85d3b] border-[#b85d3b] text-white shadow-sm' : 'bg-white border-[#E8DFD1] text-stone-600 hover:bg-[#F5EDE2]'
+                                  teamRole === item.id ? 'bg-[#161D1A] border-[#10B981] text-white shadow-sm' : 'bg-white border-[#E5ECE7] text-stone-600 hover:bg-[#F4F6F4]'
                                 )}
                               >
                                 {item.label}
@@ -942,7 +949,7 @@ export default function LoginPage() {
                   </div>
 
                   {/* Method selector */}
-                  <div className="flex gap-2 mb-4 bg-[#EFE8DD] p-1 rounded-xl border border-[#E8DFD1]">
+                  <div className="flex gap-2 mb-4 bg-stone-100/90 p-1 rounded-xl border border-[#E5ECE7]">
                     <button
                       type="button"
                       onClick={() => {
@@ -951,7 +958,7 @@ export default function LoginPage() {
                       }}
                       className={clsx(
                         'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all',
-                        method === 'phone' ? 'bg-white text-[#b85d3b] shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                        method === 'phone' ? 'bg-white text-[#059669] shadow-xs' : 'text-stone-600 hover:text-stone-900'
                       )}
                     >
                       <Phone className="w-3.5 h-3.5" /> Phone Number
@@ -964,7 +971,7 @@ export default function LoginPage() {
                       }}
                       className={clsx(
                         'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all',
-                        method === 'email' ? 'bg-white text-[#b85d3b] shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                        method === 'email' ? 'bg-white text-[#059669] shadow-xs' : 'text-stone-600 hover:text-stone-900'
                       )}
                     >
                       <Mail className="w-3.5 h-3.5" /> Email Address
@@ -980,25 +987,25 @@ export default function LoginPage() {
                       >
                         <div>
                           <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                            <User className="w-3 h-3 text-[#b85d3b]" /> Full Name
+                            <User className="w-3 h-3 text-[#059669]" /> Full Name
                           </label>
                           <input
                             type="text"
                             placeholder="Amey Kulkarni"
                             value={devName}
                             onChange={(e) => setDevName(e.target.value)}
-                            className="input w-full px-4 py-3 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
+                            className="input w-full px-4 py-3 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
                           />
                         </div>
 
                         <div>
                           <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-[#b85d3b]" /> Current City
+                            <MapPin className="w-3 h-3 text-[#059669]" /> Current City
                           </label>
                           <select
                             value={devCity}
                             onChange={(e) => setDevCity(e.target.value)}
-                            className="input w-full px-4 py-3 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-semibold bg-white"
+                            className="input w-full px-4 py-3 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-semibold bg-white"
                           >
                             {CITIES.map((c) => (
                               <option key={c} value={c}>{c}</option>
@@ -1018,7 +1025,7 @@ export default function LoginPage() {
                         value={contact}
                         onChange={(e) => setContact(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleDevSendOtp()}
-                        className="input w-full px-4 py-3 rounded-xl border border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-1 focus:ring-[#b85d3b] transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
+                        className="input w-full px-4 py-3 rounded-xl border border-[#E5ECE7] focus:border-[#84CC16] focus:ring-2 focus:ring-[#84CC16]/30 transition-all text-stone-900 font-medium placeholder-stone-400 bg-white"
                       />
                     </div>
                   </div>
@@ -1026,7 +1033,7 @@ export default function LoginPage() {
                   <button
                     onClick={handleDevSendOtp}
                     disabled={loading}
-                    className="w-full justify-center py-3.5 text-base mt-5 rounded-xl font-bold bg-[#b85d3b] hover:bg-[#a34f30] text-white shadow-sm flex items-center gap-2 transition"
+                    className="w-full justify-center py-3.5 text-base mt-5 rounded-xl font-bold bg-gradient-to-r from-[#A3E635] to-[#84CC16] hover:from-[#B5F442] hover:to-[#8ED618] text-[#0B0F0D] font-bold shadow-[0_4px_20px_rgba(163,230,53,0.35)] shadow-sm flex items-center gap-2 transition"
                   >
                     {loading ? (
                       <div className="spinner w-5 h-5 border-white" />
@@ -1044,7 +1051,7 @@ export default function LoginPage() {
                         Need a test account?{' '}
                         <button
                           onClick={() => { setMode('signup'); setContact('') }}
-                          className="text-[#b85d3b] font-bold hover:underline"
+                          className="text-[#059669] font-bold hover:underline"
                         >
                           Sign Up Role
                         </button>
@@ -1054,7 +1061,7 @@ export default function LoginPage() {
                         Already have a test role?{' '}
                         <button
                           onClick={() => { setMode('signin'); setContact('') }}
-                          className="text-[#b85d3b] font-bold hover:underline"
+                          className="text-[#059669] font-bold hover:underline"
                         >
                           Sign In
                         </button>
@@ -1078,11 +1085,11 @@ export default function LoginPage() {
 
                   {devOtp && (
                     <div className="p-4 bg-[#faeae3] border border-[#f3d2c4] rounded-2xl flex items-start gap-3">
-                      <Info className="w-5 h-5 text-[#b85d3b] flex-shrink-0 mt-0.5" />
+                      <Info className="w-5 h-5 text-[#059669] flex-shrink-0 mt-0.5" />
                       <div className="text-sm text-[#8a3e23]">
                         <strong className="font-bold">🔐 Dev Mode OTP:</strong>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="font-mono bg-white px-2 py-0.5 rounded border border-[#E8DFD1] font-extrabold tracking-widest text-[#b85d3b] text-lg">
+                          <span className="font-mono bg-white px-2 py-0.5 rounded border border-[#E5ECE7] font-extrabold tracking-widest text-[#059669] text-lg">
                             {devOtp}
                           </span>
                           <span className="text-xs text-stone-500">(Click verify to enter)</span>
@@ -1099,7 +1106,7 @@ export default function LoginPage() {
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                       onKeyDown={(e) => e.key === 'Enter' && handleDevVerify()}
-                      className="input w-full text-center text-3xl py-3 rounded-2xl border-2 tracking-[0.4em] font-mono border-[#E8DFD1] focus:border-[#b85d3b] focus:ring-0 text-stone-900 bg-white"
+                      className="input w-full text-center text-3xl py-3 rounded-2xl border-2 tracking-[0.4em] font-mono border-[#E5ECE7] focus:border-[#84CC16] focus:ring-0 text-stone-900 bg-white"
                       autoFocus
                     />
                   </div>
@@ -1107,14 +1114,14 @@ export default function LoginPage() {
                   <button
                     onClick={handleDevVerify}
                     disabled={loading}
-                    className="w-full justify-center py-3.5 text-base rounded-xl font-bold bg-[#b85d3b] hover:bg-[#a34f30] text-white shadow-sm flex items-center gap-2 transition"
+                    className="w-full justify-center py-3.5 text-base rounded-xl font-bold bg-gradient-to-r from-[#A3E635] to-[#84CC16] hover:from-[#B5F442] hover:to-[#8ED618] text-[#0B0F0D] font-bold shadow-[0_4px_20px_rgba(163,230,53,0.35)] shadow-sm flex items-center gap-2 transition"
                   >
                     {loading ? <div className="spinner w-5 h-5 border-white" /> : <><span>Verify & Access Platform</span><ArrowRight className="w-5 h-5" /></>}
                   </button>
 
                   <button
                     onClick={() => { setStep('form'); setOtp('') }}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-[#b85d3b] transition mx-auto"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-[#059669] transition mx-auto"
                   >
                     <RefreshCw className="w-3.5 h-3.5" /> Go Back
                   </button>
@@ -1126,7 +1133,7 @@ export default function LoginPage() {
 
         {/* Footer info */}
         <div className="text-center pt-4 text-xs text-stone-400">
-          InteriorAI Platform &copy; 2026. Bank-grade 256-bit encryption.
+          InteriorAI Platform &copy; 2026.
         </div>
       </div>
 
@@ -1140,12 +1147,12 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-l from-stone-950/75 via-stone-900/35 to-transparent" />
 
-        <div className="absolute bottom-12 left-8 right-8 glass rounded-2xl p-6 border border-white/20 shadow-xl backdrop-blur-md">
+        <div className="absolute bottom-12 left-8 right-8 bg-[#161D1A]/85 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
           <p className="text-white font-medium text-lg leading-relaxed">
             &quot;Designed my entire 3BHK in under 20 minutes with InteriorAI. The renders and budget calculator were incredibly accurate!&quot;
           </p>
           <div className="flex items-center gap-3 mt-4">
-            <div className="w-10 h-10 rounded-full bg-[#b85d3b] flex items-center justify-center text-white text-sm font-extrabold shadow-inner border border-white/20">
+            <div className="w-10 h-10 rounded-full bg-[#161D1A] flex items-center justify-center text-white text-sm font-extrabold shadow-inner border border-white/20">
               PM
             </div>
             <div>

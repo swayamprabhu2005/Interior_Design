@@ -15,13 +15,13 @@ import NotificationCenter from '@/components/NotificationCenter'
 
 function getAvatarColor(name: string): string {
   const colors = [
-    '#B85D3B', // Terracotta
-    '#C5A059', // Champagne Bronze
+    '#059669', // Deep Forest Emerald
+    '#10B981', // Mint Emerald
+    '#161D1A', // Frosted Pine
+    '#E2B870', // Champagne Gold
+    '#84CC16', // Luminous Lime
     '#4E5B4B', // Muted Sage
-    '#7A664E', // Warm Taupe
-    '#9E4A2A', // Burnt Amber
     '#5C6B73', // Slate Slate
-    '#8D5B4C', // Clay
   ]
   let hash = 0
   const str = name || 'User'
@@ -33,7 +33,6 @@ function getAvatarColor(name: string): string {
 
 function cleanDisplayName(name?: string): string {
   if (!name) return 'User'
-  // Remove prefixes like "A." if user profile holds "A.Seeded"
   const cleaned = name.replace(/^([A-Za-z]\.)\s*/, '').trim()
   return cleaned.split(' ')[0] || cleaned || 'User'
 }
@@ -102,7 +101,7 @@ export default function Navbar() {
   const avatarBg = getAvatarColor(user?.email || rawName)
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#E8DFD1]/80 backdrop-blur-xl bg-[#FAF6F0]/90 shadow-xs">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-stone-200/60 backdrop-blur-xl bg-[#FAFBF9]/85 shadow-xs transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
@@ -121,13 +120,13 @@ export default function Navbar() {
                   }}
                 />
                 <div
-                  className="logo-fallback hidden w-full h-full rounded-lg bg-gradient-to-br from-[#b85d3b] to-[#9c4a2a] items-center justify-center text-white shadow-xs"
+                  className="logo-fallback hidden w-full h-full rounded-lg bg-gradient-to-br from-[#10B981] to-[#059669] items-center justify-center text-white shadow-xs"
                 >
                   <Sparkles className="w-4 h-4" />
                 </div>
               </div>
               <span className="text-stone-900 font-bold text-xl tracking-tight font-serif">
-                Interior<span className="text-[#b85d3b]">AI</span>
+                Interior<span className="text-[#059669]">AI</span>
               </span>
             </Link>
 
@@ -137,10 +136,10 @@ export default function Navbar() {
                 type="button"
                 onClick={() => setDrawerOpen(!drawerOpen)}
                 className={clsx(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border shadow-2xs active:scale-95",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border shadow-2xs active:scale-95 cursor-pointer",
                   drawerOpen
-                    ? "bg-[#b85d3b] text-white border-[#b85d3b] ring-2 ring-[#b85d3b]/20"
-                    : "bg-white/80 hover:bg-white text-stone-700 border-[#E8DFD1] hover:border-stone-400"
+                    ? "bg-[#161D1A] text-white border-[#161D1A] ring-2 ring-[#161D1A]/10 shadow-sm"
+                    : "bg-white/90 hover:bg-white text-stone-800 border-stone-200/80 hover:border-stone-400"
                 )}
                 title="Toggle navigation links"
               >
@@ -168,8 +167,8 @@ export default function Navbar() {
                           className={clsx(
                             "px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0",
                             isActive
-                              ? "bg-[#b85d3b] text-white shadow-xs"
-                              : "text-stone-700 hover:text-stone-900 hover:bg-stone-200/60"
+                              ? "bg-[#161D1A] text-white shadow-xs"
+                              : "text-stone-700 hover:text-stone-900 hover:bg-stone-100"
                           )}
                         >
                           {label}
@@ -193,7 +192,7 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full bg-white/80 hover:bg-white border border-[#E8DFD1] hover:border-stone-400 transition shadow-2xs group"
+                    className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full bg-white/90 hover:bg-white border border-stone-200/80 hover:border-stone-400 transition shadow-2xs group cursor-pointer"
                     aria-label="User profile menu"
                   >
                     <div
@@ -213,9 +212,9 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-56 bg-[#FAF6F0] border border-[#E8DFD1] rounded-2xl shadow-xl p-2.5 space-y-1.5 z-50 text-left"
+                        className="absolute right-0 mt-2 w-56 bg-[#FAFBF9] border border-stone-200/80 rounded-2xl shadow-xl p-2.5 space-y-1.5 z-50 text-left"
                       >
-                        <div className="px-3 py-2 border-b border-[#E8DFD1]/70">
+                        <div className="px-3 py-2 border-b border-stone-200/60">
                           <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Signed in as</p>
                           <p className="text-sm font-extrabold text-stone-900 truncate mt-0.5">{displayName}</p>
                           {user?.email && <p className="text-[10px] text-stone-500 truncate">{user.email}</p>}
@@ -226,7 +225,7 @@ export default function Navbar() {
                           onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-stone-700 hover:text-stone-900 hover:bg-white transition"
                         >
-                          <User className="w-3.5 h-3.5 text-[#b85d3b]" />
+                          <User className="w-3.5 h-3.5 text-[#059669]" />
                           <span>Edit Profile</span>
                         </Link>
 
@@ -236,7 +235,7 @@ export default function Navbar() {
                             setProfileOpen(false)
                             handleLogout()
                           }}
-                          className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition"
+                          className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                         >
                           <LogOut className="w-3.5 h-3.5" />
                           <span>Logout</span>
@@ -250,7 +249,7 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="text-xs font-bold text-stone-700 hover:text-stone-900 transition px-3.5 py-2 rounded-xl hover:bg-stone-200/50"
+                  className="text-xs font-bold text-stone-700 hover:text-stone-900 transition px-3.5 py-2 rounded-xl hover:bg-stone-100"
                 >
                   Sign In
                 </Link>
@@ -268,7 +267,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             {isLoggedIn && <NotificationCenter />}
             <button
-              className="text-stone-800 p-2 rounded-xl hover:bg-stone-200/50 transition"
+              className="text-stone-800 p-2 rounded-xl hover:bg-stone-100 transition cursor-pointer"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle mobile menu"
             >
@@ -285,7 +284,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden border-t border-[#E8DFD1] bg-[#FAF6F0]/98 backdrop-blur-xl"
+            className="md:hidden overflow-hidden border-t border-stone-200/60 bg-[#FAFBF9]/98 backdrop-blur-xl"
           >
             <div className="px-4 py-4 space-y-2">
               {navLinks.map(({ href, label, icon: Icon }) => (
@@ -293,14 +292,14 @@ export default function Navbar() {
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-200/50 transition text-xs font-bold"
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition text-xs font-bold"
                 >
-                  <Icon className="w-4 h-4 text-[#b85d3b]" /> {label}
+                  <Icon className="w-4 h-4 text-[#059669]" /> {label}
                 </Link>
               ))}
 
               {isLoggedIn ? (
-                <div className="pt-2 border-t border-[#E8DFD1]/70 space-y-2">
+                <div className="pt-2 border-t border-stone-200/60 space-y-2">
                   <div className="px-3 py-1 flex items-center gap-2.5">
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black"
@@ -313,13 +312,13 @@ export default function Navbar() {
                   <Link
                     href="/dashboard?edit=true"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-200/50 transition text-xs font-bold"
+                    className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition text-xs font-bold"
                   >
-                    <User className="w-4 h-4 text-[#b85d3b]" /> Edit Profile
+                    <User className="w-4 h-4 text-[#059669]" /> Edit Profile
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setMobileOpen(false) }}
-                    className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition text-xs font-bold"
+                    className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition text-xs font-bold cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" /> Logout
                   </button>

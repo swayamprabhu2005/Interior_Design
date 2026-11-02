@@ -24,21 +24,39 @@ export default function RootLayout({
         {children}
         <Toaster
           position="top-right"
-          containerStyle={{ top: '75px' }}
+          containerStyle={{ top: '80px', right: '24px' }}
           toastOptions={{
-            duration: 4000,
+            duration: 3500,
+            icon: null, // Strictly text-only (zero ticks or checkmarks)
             style: {
-              background: '#1e1b4b',
-              color: '#fff',
-              borderRadius: '12px',
-              border: '1px solid rgba(129, 140, 248, 0.3)',
-              fontSize: '14px',
+              background: 'rgba(255, 255, 255, 0.96)',
+              color: '#132A1C',
+              backdropFilter: 'blur(16px)',
+              borderRadius: '16px',
+              border: '1px solid rgba(132, 204, 22, 0.45)',
+              boxShadow: '0 14px 34px -4px rgba(22, 43, 30, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04)',
+              fontSize: '13.5px',
+              fontWeight: '700',
+              letterSpacing: '0.01em',
+              padding: '12px 20px',
             },
             success: {
-              iconTheme: { primary: '#818cf8', secondary: '#fff' },
+              icon: null,
+              style: {
+                background: 'rgba(255, 255, 255, 0.97)',
+                color: '#132A1C',
+                border: '1px solid rgba(132, 204, 22, 0.55)',
+                borderLeft: '4px solid #84CC16',
+              },
             },
             error: {
-              iconTheme: { primary: '#f87171', secondary: '#fff' },
+              icon: null,
+              style: {
+                background: 'rgba(255, 255, 255, 0.97)',
+                color: '#991B1B',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderLeft: '4px solid #EF4444',
+              },
             },
           }}
         />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useCustomerStore } from '@/stores/customerStore'
-import { Bell, BellOff } from 'lucide-react'
+import { Bell, BellOff, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 
 interface NotificationCardProps {
@@ -58,10 +58,10 @@ function NotificationCard({ n, onRead, onDelete }: NotificationCardProps) {
             onRead()
           }
         }}
-        className={`relative z-10 p-3 rounded-xl border border-[#E8DFD1] border-l-4 cursor-grab active:cursor-grabbing select-none transition-colors duration-200 ${
+        className={`relative z-10 p-3.5 rounded-xl border border-l-4 cursor-grab active:cursor-grabbing select-none transition-all duration-200 ${
           n.read 
-            ? 'bg-stone-50 border-l-stone-300 text-stone-500 hover:bg-stone-100' 
-            : 'bg-white hover:bg-stone-50/80 border-l-[#b85d3b] shadow-xs text-stone-900'
+            ? 'bg-stone-50/70 border-stone-200/60 border-l-stone-300 text-stone-500 hover:bg-stone-100/70' 
+            : 'bg-white hover:bg-[#F8FAF8] border-[#E2EDE7] border-l-[#84CC16] shadow-xs text-stone-900'
         }`}
       >
         <div className="flex justify-between items-start gap-2">
@@ -69,10 +69,10 @@ function NotificationCard({ n, onRead, onDelete }: NotificationCardProps) {
             {n.title}
           </h4>
           {!n.read && (
-            <span className="w-2 h-2 bg-[#b85d3b] rounded-full flex-shrink-0 mt-1 shadow-xs" />
+            <span className="w-2 h-2 bg-[#84CC16] rounded-full flex-shrink-0 mt-1 shadow-[0_0_8px_rgba(132,204,22,0.6)]" />
           )}
         </div>
-        <p className={`text-[11px] mt-1 leading-relaxed ${n.read ? 'text-stone-400' : 'text-stone-600'}`}>
+        <p className={`text-[11px] mt-1 leading-relaxed ${n.read ? 'text-stone-400' : 'text-stone-600 font-medium'}`}>
           {n.message}
         </p>
         <div className="text-[9px] text-stone-400 mt-1.5 font-medium flex items-center justify-between">
@@ -92,6 +92,7 @@ export default function NotificationCenter() {
     deleteNotification
   } = useCustomerStore()
   const [isOpen, setIsOpen] = useState(false)
+  const [isClearing, setIsClearing] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -119,6 +120,18 @@ export default function NotificationCenter() {
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
+  const handleClearAll = async () => {
+    if (isClearing || notifications.length === 0) return
+    setIsClearing(true)
+    try {
+      await Promise.all(notifications.map((n) => deleteNotification(n.id)))
+    } catch (e) {
+      console.error('Failed to clear notifications:', e)
+    } finally {
+      setIsClearing(false)
+    }
+  }
+
   return (
     <div className="relative" ref={containerRef}>
       <button
@@ -128,7 +141,7 @@ export default function NotificationCenter() {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 bg-[#b85d3b] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce shadow-xs">
+          <span className="absolute top-1 right-1 bg-[#84CC16] text-[#0B0F0D] text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center animate-bounce shadow-[0_2px_8px_rgba(132,204,22,0.4)]">
             {unreadCount}
           </span>
         )}
@@ -143,24 +156,37 @@ export default function NotificationCenter() {
       )}
 
       {isOpen && (
-        <div className="absolute top-full right-0 w-[340px] mt-2 bg-[#FAF6F0] backdrop-blur-md shadow-2xl rounded-2xl border-2 border-[#E8DFD1] p-4 z-50 max-h-[420px] overflow-y-auto scrollbar-thin scrollbar-thumb-stone-300 scrollbar-track-transparent animate-in fade-in slide-in-from-top-2 duration-150 flex flex-col gap-3">
-          <div className="flex justify-between items-center pb-2.5 border-b border-[#E8DFD1]">
+        <div className="absolute top-full right-0 w-[350px] mt-2 bg-[#FAFBF9] shadow-[0_25px_60px_-15px_rgba(22,29,26,0.30)] rounded-2xl border-2 border-[#E2EDE7] p-4 z-50 max-h-[440px] overflow-y-auto scrollbar-thin scrollbar-thumb-stone-300 scrollbar-track-transparent animate-in fade-in slide-in-from-top-2 duration-150 flex flex-col gap-3">
+          <div className="flex justify-between items-center pb-2.5 border-b border-stone-100">
             <h3 className="font-extrabold text-stone-900 text-sm flex items-center gap-1.5">
               Notifications
               {unreadCount > 0 && (
-                <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-[#faeae3] text-[#b85d3b] border border-[#f3d2c4] rounded-full">
+                <span className="px-2 py-0.5 text-[9px] font-black bg-[#84CC16]/20 text-[#365314] border border-[#84CC16]/40 rounded-full">
                   {unreadCount} New
                 </span>
               )}
             </h3>
-            {unreadCount > 0 && (
-              <button
-                onClick={() => markAllNotificationsRead()}
-                className="text-[11px] font-bold text-[#b85d3b] hover:text-[#9c4b2c] transition-colors"
-              >
-                Mark all as read
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => markAllNotificationsRead()}
+                  className="text-[11px] font-bold text-[#4D7C0F] hover:text-[#365314] transition-colors"
+                >
+                  Mark read
+                </button>
+              )}
+              {notifications.length > 0 && (
+                <button
+                  onClick={handleClearAll}
+                  disabled={isClearing}
+                  className="text-[11px] font-bold text-stone-500 hover:text-red-600 transition-colors flex items-center gap-1"
+                  title="Clear all notifications"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  <span>Clear all</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {notifications.length === 0 ? (
@@ -183,7 +209,7 @@ export default function NotificationCenter() {
                   ))}
                 </AnimatePresence>
               </div>
-              <div className="text-[10px] text-stone-400 text-center pt-2 mt-1 border-t border-[#E8DFD1] select-none font-medium">
+              <div className="text-[10px] text-stone-400 text-center pt-2 mt-1 border-t border-stone-100 select-none font-medium">
                 Swipe left on a card to delete
               </div>
             </>
