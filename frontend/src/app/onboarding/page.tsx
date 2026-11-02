@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { projectsAPI, catalogAPI, enterpriseAPI, customerAPI } from '@/lib/api'
 
 import BhkSelector from '@/components/BhkSelector'
+import FurnitureButton from '@/components/FurnitureButton'
 import Navbar from '@/components/Navbar'
 import toast from 'react-hot-toast'
 import {
@@ -1357,18 +1358,27 @@ export default function OnboardingPage() {
           </button>
 
           {step < STEPS.length - 1 ? (
-            <button onClick={handleNext} disabled={!canNext()}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-xl font-bold bg-[#b85d3b] hover:bg-[#a04e30] shadow-md text-white flex items-center gap-1.5">
-              Next <ArrowRight className="w-4 h-4" />
-            </button>
+            <FurnitureButton
+              onClick={handleNext}
+              disabled={!canNext()}
+              size="md"
+              variant="primary"
+              icon="arrow"
+              stepIndex={step}
+            >
+              Next Step
+            </FurnitureButton>
           ) : (
-            <button onClick={handleSubmit} disabled={!canNext() || loading}
-              className="btn-primary disabled:opacity-50 px-6 py-3 rounded-xl font-bold bg-[#b85d3b] hover:bg-[#a04e30] shadow-md text-white flex items-center gap-1.5">
-              {loading
-                ? <div className="spinner w-5 h-5 border-white" />
-                : <><Sparkles className="w-4 h-4" /> Find Packages <ArrowRight className="w-4 h-4" /></>
-              }
-            </button>
+            <FurnitureButton
+              onClick={handleSubmit}
+              disabled={!canNext() || loading}
+              size="md"
+              variant="primary"
+              icon="sparkle"
+              stepIndex={5}
+            >
+              {loading ? 'Finding Packages...' : 'Find Curated Packages'}
+            </FurnitureButton>
           )}
         </div>
         </div>
@@ -1410,32 +1420,12 @@ export default function OnboardingPage() {
               </button>
             </div>
 
-            <div className="flex-1 min-h-0 bg-[#0f0e0d] rounded-xl flex items-center justify-center p-3 overflow-hidden border border-stone-800">
+            <div className="relative flex-1 min-h-0 bg-[#0f0e0d] rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden border border-stone-800">
               <img
                 src={lightboxPlan.image_url}
                 alt={lightboxPlan.name}
-                className="max-h-[65vh] w-auto max-w-full object-contain"
+                className="max-h-[74vh] w-auto max-w-full object-contain"
               />
-            </div>
-
-            <div className="flex items-center justify-between pt-3 mt-3 border-t border-stone-800 text-xs text-stone-400">
-              <span>Click anywhere outside the frame to close</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setLocal((s) => ({ ...s, typology_id: lightboxPlan.id }))
-                  setLightboxPlan(null)
-                  toast.success(`Selected ${lightboxPlan.name}`)
-                }}
-                className={clsx(
-                  "px-4 py-1.5 rounded-lg font-bold transition-all",
-                  local.typology_id === lightboxPlan.id
-                    ? "bg-[#4e5b4b] text-white"
-                    : "bg-[#b85d3b] hover:bg-[#a04e30] text-white"
-                )}
-              >
-                {local.typology_id === lightboxPlan.id ? "Plan Selected ✓" : "Select This Plan"}
-              </button>
             </div>
           </div>
         </div>

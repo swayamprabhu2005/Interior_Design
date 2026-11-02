@@ -124,3 +124,21 @@ test_edge.png
 walkthrough_performance_evaluation.png
 *.docx
 *.pptx
+
+
+# UI Skills reference and inspiration library
+UI Skills/
+"UI Skills/"
+UI Skills
+
+UI skills/
+[Uu][Ii] [Ss]kills/
+[Uu][Ii]-[Ss]kills/
+ui-skills/
+UI_Skills/
+
+# Button and asset generation scratch scripts
+generate_claymorphic_buttons.py
+update_buttons_from_uploads.py
+update_visualize.py
+update_lightbox.py

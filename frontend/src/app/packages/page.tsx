@@ -11,12 +11,12 @@ import clsx from 'clsx'
 
 const TIER_COLOR: Record<string, string> = {
   basic:   'bg-stone-100 text-stone-700 border-stone-200',
-  premium: 'bg-[#faeae3] text-[#b85d3b] border-[#f4d1c3]',
-  luxury:  'bg-[#f6f1e3] text-[#c5a059] border-[#e8dcb8]',
+  premium: 'bg-[bg-emerald-50 text-emerald-800] text-[#059669] border-[#f4d1c3]',
+  luxury:  'bg-[bg-amber-50 text-amber-800] text-[#c5a059] border-[#e8dcb8]',
 }
 const TIER_BADGE: Record<string, string> = {
   basic:   'border-stone-300 text-stone-600',
-  premium: 'border-[#b85d3b]/40 text-[#b85d3b]',
+  premium: 'border-emerald-500/40 text-emerald-800',
   luxury:  'border-[#c5a059] text-[#a68238]',
 }
 
@@ -146,7 +146,7 @@ function PackagesContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2]">
+    <div className="min-h-screen bg-[#FAFBF9]">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
 
@@ -154,8 +154,8 @@ function PackagesContent() {
         <div className="mb-10 text-center sm:text-left">
           <div className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold uppercase tracking-wider mb-2">
             {isAIRanked
-              ? <span className="flex items-center gap-1.5 text-[#b85d3b] bg-[#faeae3] px-3 py-1 rounded-full"><Brain className="w-3.5 h-3.5" /> AI-Ranked for your style & palette</span>
-              : <span className="flex items-center gap-1.5 text-[#b85d3b] bg-[#faeae3] px-3 py-1 rounded-full"><Sparkles className="w-3.5 h-3.5" /> Tailored packages for your {bhk}</span>
+              ? <span className="flex items-center gap-1.5 text-[#059669] bg-[bg-emerald-50 text-emerald-800] px-3 py-1 rounded-full"><Brain className="w-3.5 h-3.5" /> AI-Ranked for your style & palette</span>
+              : <span className="flex items-center gap-1.5 text-[#059669] bg-[bg-emerald-50 text-emerald-800] px-3 py-1 rounded-full"><Sparkles className="w-3.5 h-3.5" /> Tailored packages for your {bhk}</span>
             }
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 font-serif mb-2">Choose Your Design Package</h1>
@@ -170,7 +170,7 @@ function PackagesContent() {
         {loading ? (
           <div className="grid md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-3xl overflow-hidden bg-white border border-[#E8DFD1] shadow-sm">
+              <div key={i} className="rounded-3xl overflow-hidden bg-white border border-[#E5ECE7] shadow-sm">
                 <div className="shimmer h-56 bg-stone-100" />
                 <div className="p-6 space-y-3">
                   <div className="shimmer h-5 rounded w-2/3 bg-stone-200" />
@@ -181,7 +181,7 @@ function PackagesContent() {
             ))}
           </div>
         ) : packages.length === 0 ? (
-          <div className="text-center py-24 bg-white border border-[#E8DFD1] rounded-3xl p-8">
+          <div className="text-center py-24 bg-white border border-[#E5ECE7] rounded-3xl p-8">
             <div className="text-5xl mb-4">🛋️</div>
             <p className="text-stone-600 text-lg font-serif">No packages found for {bhk}.</p>
           </div>
@@ -195,12 +195,12 @@ function PackagesContent() {
                 transition={{ delay: i * 0.08 }}
                 className={clsx(
                   'bg-white rounded-3xl border overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group relative flex flex-col',
-                  pkg._recommended ? 'border-[#b85d3b] ring-2 ring-[#b85d3b]/20' : 'border-[#E8DFD1]'
+                  pkg._recommended ? 'border-[#84CC16] ring-2 ring-[#84CC16]/25 shadow-lg' : 'border-[#E5ECE7]'
                 )}
               >
                 {/* AI recommended badge */}
                 {pkg._recommended && (
-                  <div className="bg-[#b85d3b] text-white text-[11px] font-bold py-1.5 px-4 text-center tracking-wider uppercase z-10 flex items-center justify-center gap-1.5">
+                  <div className="bg-gradient-to-r from-[#A3E635] to-[#84CC16] text-[#0B0F0D] text-[11px] font-bold py-1.5 px-4 text-center tracking-wider uppercase z-10 flex items-center justify-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-[#c5a059]" />
                     <span>{pkg._label || 'Best Match for You'}</span>
                   </div>
@@ -258,7 +258,7 @@ function PackagesContent() {
                     <div className="flex items-end justify-between mb-5 pt-4 border-t border-stone-100">
                       <div>
                         <div className="text-[10px] font-bold uppercase tracking-wider text-stone-500 mb-0.5">Fixed Package Total</div>
-                        <div className="text-3xl font-extrabold text-[#b85d3b] font-serif">
+                        <div className="text-3xl font-extrabold text-[#059669] font-serif">
                           ₹{(getDynamicPrice(pkg) / 100000).toFixed(1)}L
                         </div>
                       </div>
@@ -276,8 +276,8 @@ function PackagesContent() {
                       className={clsx(
                         'w-full py-3.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm',
                         pkg._recommended
-                          ? 'bg-[#b85d3b] hover:bg-[#a04e30] text-white shadow-md'
-                          : 'bg-white border-2 border-stone-200 hover:border-[#b85d3b] text-stone-800 hover:text-[#b85d3b]'
+                          ? 'bg-gradient-to-r from-[#A3E635] to-[#84CC16] hover:from-[#B5F442] hover:to-[#8ED618] text-[#0B0F0D] font-extrabold shadow-md'
+                          : 'bg-white border-2 border-stone-200 hover:border-[#84CC16] text-stone-800 hover:text-[#059669]'
                       )}
                     >
                       {selecting === pkg.id ? (
@@ -299,7 +299,7 @@ function PackagesContent() {
 
 export default function PackagesPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FAF7F2]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#FAFBF9]" />}>
       <PackagesContent />
     </Suspense>
   )
