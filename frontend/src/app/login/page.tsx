@@ -1138,7 +1138,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel – visual hero banner */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden">
+      <div className="hidden md:flex flex-1 relative overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1000&q=80&fit=crop"
           alt="Beautiful interior design"

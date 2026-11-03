@@ -529,6 +529,201 @@ def _find_candidate_products_for_companion(room_type: str, cat_id: str, anchor: 
     return results
 
 
+
+# ?? Ergonomic Knowledge Graph ????????????????????????????????????????????????
+# Evaluates inter-item architectural clearances, ergonomic height alignments,
+# and scale proportionality constraints (dimensions in millimeters).
+
+def _eval_sofa_coffee_table_ergonomics(sofa: Product, table: Product) -> tuple[float, bool, str]:
+    """
+    Sofa & Coffee Table Ergonomic Proportions:
+    - Table height should align at or slightly below sofa seat level (typically 360-500mm).
+    - Table length should be 42% - 78% of sofa width for balanced visual anchor and walking clearance.
+    """
+    s_w = float(sofa.width or 2000.0)
+    t_w = float(table.width or 1000.0)
+    t_h = float(table.height or 450.0)
+
+    score = 0.0
+    reason_parts = []
+
+    # Height evaluation
+    if 360.0 <= t_h <= 500.0:
+        score += 3.5
+        reason_parts.append(f"Ergonomic table height ({int(t_h)}mm)")
+    elif t_h > 580.0:
+        score -= 4.0
+        reason_parts.append(f"Table height ({int(t_h)}mm) sits too high for living sofa")
+
+    # Width / Length proportion
+    ratio = t_w / s_w if s_w > 0 else 0.5
+    if 0.42 <= ratio <= 0.78:
+        score += 3.5
+        reason_parts.append(f"proportional length ({int(t_w)}mm vs {int(s_w)}mm sofa)")
+    elif ratio > 0.90:
+        score -= 4.0
+        reason_parts.append("oversized coffee table relative to sofa width")
+
+    reason = " & ".join(reason_parts) if reason_parts else ""
+    return score, (score >= 0), reason
+
+
+def _eval_bed_nightstand_ergonomics(bed: Product, nightstand: Product) -> tuple[float, bool, str]:
+    """
+    Bed & Bedside Table Ergonomics:
+    - Nightstand surface should be within -60mm to +120mm of mattress level (standard 400-580mm).
+    - Nightstand width should be compact (380-620mm) to preserve wall egress.
+    """
+    n_h = float(nightstand.height or 480.0)
+    n_w = float(nightstand.width or 450.0)
+
+    score = 0.0
+    reason = ""
+
+    if 400.0 <= n_h <= 580.0:
+        score += 4.5
+        reason = f"Ideal mattress-level nightstand height ({int(n_h)}mm)"
+    elif 340.0 <= n_h < 400.0 or 580.0 < n_h <= 660.0:
+        score += 2.0
+        reason = f"Compatible bedside table height ({int(n_h)}mm)"
+    elif n_h > 720.0:
+        score -= 5.0
+        reason = f"Nightstand too tall ({int(n_h)}mm) for bedside reach"
+
+    if n_w <= 620.0:
+        score += 1.5
+    else:
+        score -= 2.5
+
+    return score, (score >= 0), reason
+
+
+def _eval_desk_chair_ergonomics(desk: Product, chair: Product) -> tuple[float, bool, str]:
+    """
+    Study Desk & Task Chair Clearance:
+    - Standard desk height 700-780mm paired with standard chair (750-1050mm total height)
+      ensures 220-300mm thigh clearance beneath desk surface.
+    """
+    d_h = float(desk.height or 750.0)
+    c_h = float(chair.height or 850.0)
+
+    if 700.0 <= d_h <= 780.0 and 750.0 <= c_h <= 1050.0:
+        return 4.0, True, "Ergonomic desk-to-chair posture clearance"
+    elif d_h < 680.0 or c_h > 1150.0:
+        return -3.0, False, "Tight thigh clearance between desk and chair"
+    return 1.0, True, "Standard study desk pairing"
+
+
+def _eval_cabinets_depth_ergonomics(base: Product, wall: Product) -> tuple[float, bool, str]:
+    """
+    Kitchen Modular Cabinet Hierarchy:
+    - Overhead wall cabinets must be shallower than base countertop cabinets (typically 300-380mm vs 580-650mm)
+      so cooks don't bump their heads.
+    """
+    b_d = float(base.depth or 600.0)
+    w_d = float(wall.depth or 350.0)
+
+    if w_d <= (b_d - 140.0):
+        return 4.5, True, f"Ergonomic overhead depth ({int(w_d)}mm) ensures head clearance over {int(b_d)}mm base"
+    elif w_d >= b_d:
+        return -6.0, False, "Overhead wall cabinet too deep for countertop safety"
+    return 1.0, True, "Standard cabinet depth ratio"
+
+
+def _eval_sofa_side_table_ergonomics(sofa: Product, side_table: Product) -> tuple[float, bool, str]:
+    """
+    Sofa & Side Table Alignment:
+    - Side table height should comfortably reach sofa armrest level (450-650mm).
+    """
+    t_h = float(side_table.height or 550.0)
+    if 450.0 <= t_h <= 650.0:
+        return 3.5, True, f"Armrest-level side table height ({int(t_h)}mm)"
+    elif t_h > 720.0:
+        return -3.0, False, "Side table taller than sofa armrest"
+    return 1.0, True, "Compatible side table proportion"
+
+
+def evaluate_ergonomic_compatibility(anchor: Product, candidate: Product) -> tuple[float, bool, str]:
+    """
+    Evaluates geometric scale, clearance, and ergonomic height alignments between
+    anchor furniture and proposed companion piece using the Ergonomic Knowledge Graph.
+    """
+    a_role = detect_product_role(anchor)
+    c_role = detect_product_role(candidate)
+
+    if a_role == "sofa" and c_role == "coffee_table":
+        return _eval_sofa_coffee_table_ergonomics(anchor, candidate)
+    elif a_role == "coffee_table" and c_role == "sofa":
+        return _eval_sofa_coffee_table_ergonomics(candidate, anchor)
+    elif a_role == "sofa" and c_role == "side_table":
+        return _eval_sofa_side_table_ergonomics(anchor, candidate)
+    elif a_role == "side_table" and c_role == "sofa":
+        return _eval_sofa_side_table_ergonomics(candidate, anchor)
+    elif a_role == "bed" and c_role == "bedside_table":
+        return _eval_bed_nightstand_ergonomics(anchor, candidate)
+    elif a_role == "bedside_table" and c_role == "bed":
+        return _eval_bed_nightstand_ergonomics(candidate, anchor)
+    elif a_role == "study_desk" and c_role == "chair":
+        return _eval_desk_chair_ergonomics(anchor, candidate)
+    elif a_role == "chair" and c_role == "study_desk":
+        return _eval_desk_chair_ergonomics(candidate, anchor)
+    elif a_role == "base_cabinets" and c_role == "wall_cabinets":
+        return _eval_cabinets_depth_ergonomics(anchor, candidate)
+    elif a_role == "wall_cabinets" and c_role == "base_cabinets":
+        return _eval_cabinets_depth_ergonomics(candidate, anchor)
+
+    return 0.0, True, ""
+
+
+# ?? In-Session Dynamic Contextual Preference Re-Ranking ????????????????????????
+def extract_in_session_preferences(project: Optional[Project], current_room_id: Optional[str] = None) -> dict:
+    """
+    In-Session Dynamic Contextual Preference Re-Ranking.
+    Extracts cross-room aesthetic momentum: finishes, fabrics, and colors that the homeowner
+    has actively selected or customized in other rooms within the current project session.
+    """
+    if not project or not project.rooms:
+        return {"woods": [], "fabrics": [], "colors": [], "styles": []}
+
+    session_woods = []
+    session_fabrics = []
+    session_colors = []
+    session_styles = []
+
+    for r in project.rooms:
+        for it in (r.items or []):
+            prod = it.product
+            # 1. Custom or product wood finish
+            wf = (it.custom_wood_finish or (prod.finish if prod else "") or "").lower().strip()
+            for w in ["oak", "teak", "walnut"]:
+                if w in wf:
+                    session_woods.append(w)
+
+            # 2. Custom or product fabric
+            fb = (it.custom_fabric or (prod.primary_material if prod else "") or "").lower().strip()
+            for f in ["velvet", "linen", "woven", "leather", "leatherette"]:
+                if f in fb:
+                    session_fabrics.append(f)
+
+            # 3. Custom or product dominant color
+            c_val = (it.custom_color or (extract_dominant_color(prod) if prod else "") or "").lower().strip()
+            if c_val:
+                session_colors.append(c_val)
+
+            # 4. Product style tags
+            if prod and prod.style_tags:
+                for st in prod.style_tags:
+                    session_styles.append(st.lower().strip())
+
+    # Keep unique while preserving order of recent selection
+    return {
+        "woods": list(dict.fromkeys(session_woods)),
+        "fabrics": list(dict.fromkeys(session_fabrics)),
+        "colors": list(dict.fromkeys(session_colors)),
+        "styles": list(dict.fromkeys(session_styles)),
+    }
+
+
 @router.get("/complementary-bundle", summary="Get budget-proportional complementary product recommendations")
 def get_complementary_bundle(
     product_id: str = Query(..., description="Anchor product ID"),
@@ -560,6 +755,12 @@ def get_complementary_bundle(
                 existing_spent += float(it.unit_price or it.product.price or 0) * (it.qty or 1)
 
     remaining_room_budget = max(20000.0, room_budget - anchor.price - existing_spent)
+
+    # 2b. In-Session Dynamic Contextual Preferences (Cross-Room Material & Finish Continuity)
+    session_prefs = extract_in_session_preferences(project, room_id)
+    session_woods = session_prefs["woods"]
+    session_fabrics = session_prefs["fabrics"]
+    session_colors = session_prefs["colors"]
 
     # 2. Dynamic Companion Category Schemas tailored to anchor product & room
     schema_list = get_companion_schema_for_product(room_type, anchor)
@@ -685,6 +886,28 @@ def get_complementary_bundle(
                     compat = STYLE_COMPAT.get(ut, {})
                     for ct in cand_tags:
                         score += compat.get(ct, 0.2) * 1.5
+
+
+            # 6. Ergonomic Knowledge Graph Evaluation
+            ergo_score, ergo_compatible, ergo_reason = evaluate_ergonomic_compatibility(anchor, cand)
+            score += ergo_score
+            if ergo_reason:
+                reasons.append(ergo_reason)
+
+            # 7. In-Session Dynamic Contextual Preference Re-Ranking (Cross-Room Continuity)
+            if session_woods:
+                cand_finish_str = f"{cand_finish} {cand_mat} {' '.join(cand_wood_variants)}".lower()
+                matching_sw = [sw for sw in session_woods if sw in cand_finish_str]
+                if matching_sw:
+                    score += 4.0
+                    reasons.append(f"In-session continuity with {matching_sw[0].title()} finish")
+
+            if session_fabrics:
+                cand_fabric_str = f"{cand_mat} {' '.join(cand_fabric_variants)}".lower()
+                matching_sf = [sf for sf in session_fabrics if sf in cand_fabric_str]
+                if matching_sf:
+                    score += 3.5
+                    reasons.append(f"Harmonizes with in-session {matching_sf[0].title()} fabric")
 
             # Match Percentage (84% - 98%)
             match_pct = min(98, max(82, int(74 + (score * 1.6))))

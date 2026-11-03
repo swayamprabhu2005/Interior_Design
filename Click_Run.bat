@@ -187,9 +187,12 @@ timeout /t 4 /nobreak >nul 2>&1
 
 :: Launch Frontend
 if /i "%MODE%"=="dev" (
-    if exist "!FRONTEND!\.next" rmdir /s /q "!FRONTEND!\.next" >nul 2>&1
     start "InteriorAI - Frontend (port 3000)" /d "!FRONTEND!" cmd /k "chcp 65001 >nul && echo Frontend starting in dev mode... && npm run dev"
 ) else (
+    rem Check if a valid production build exists
+    set "NEED_BUILD=0"
+    if not exist "!FRONTEND!\.next\BUILD_ID" set "NEED_BUILD=1"
+
     rem Rebuild when git commit changed, uncommitted edits exist, or never built.
     set "HEAD=nobuild"
     for /f %%i in ('git rev-parse HEAD 2^>nul') do set "HEAD=%%i"
@@ -198,21 +201,28 @@ if /i "%MODE%"=="dev" (
     set "BUILT="
     if exist "!FRONTEND!\.next\BUILD_ID" if exist "!FRONTEND!\.next\BUILT_FROM" set /p BUILT=<"!FRONTEND!\.next\BUILT_FROM"
     if "!DIRTY!"=="1" set "BUILT=dirty_rebuild"
-    if not "!BUILT!"=="!HEAD!" (
-        echo   Building the frontend once for fast page loads. This takes a few minutes...
+    if not "!BUILT!"=="!HEAD!" set "NEED_BUILD=1"
+
+    if "!NEED_BUILD!"=="1" (
+        echo   Building the frontend for fast page loads. This takes a few minutes...
+        echo   (Tip: You can cancel and run 'Click_Run.bat dev' for instant start)
         pushd "!FRONTEND!"
         call npm run build
-        if errorlevel 1 (
-            echo   Build failed - starting in dev mode instead.
-            popd
-            start "InteriorAI - Frontend (port 3000)" /d "!FRONTEND!" cmd /k "chcp 65001 >nul && npm run dev"
-            goto :frontend_started
-        )
-        if "!DIRTY!"=="0" >"!FRONTEND!\.next\BUILT_FROM" echo !HEAD!
-        if "!DIRTY!"=="1" if exist "!FRONTEND!\.next\BUILT_FROM" del /f /q "!FRONTEND!\.next\BUILT_FROM"
         popd
+        if "!DIRTY!"=="0" if exist "!FRONTEND!\.next" >"!FRONTEND!\.next\BUILT_FROM" echo !HEAD!
+        if "!DIRTY!"=="1" if exist "!FRONTEND!\.next\BUILT_FROM" del /f /q "!FRONTEND!\.next\BUILT_FROM"
     )
-    start "InteriorAI - Frontend (port 3000)" /d "!FRONTEND!" cmd /k "chcp 65001 >nul && echo Frontend starting... && npm run start"
+
+    rem Hard safety check: Only run 'start' if BUILD_ID exists; otherwise fall back to 'dev'
+    if exist "!FRONTEND!\.next\BUILD_ID" (
+        start "InteriorAI - Frontend (port 3000)" /d "!FRONTEND!" cmd /k "chcp 65001 >nul && echo Frontend starting in production mode... && npm run start"
+    ) else (
+        echo.
+        echo   [NOTICE] Production build not found or incomplete.
+        echo   Automatically falling back to Development mode (instant start)...
+        echo.
+        start "InteriorAI - Frontend (port 3000)" /d "!FRONTEND!" cmd /k "chcp 65001 >nul && echo Frontend starting in dev mode... && npm run dev"
+    )
 )
 :frontend_started
 
